@@ -27,6 +27,9 @@
       <xsl:with-param name="pid" select="../../@PID"/>
       <xsl:with-param name="datastream" select="../@ID"/>
     </xsl:apply-templates>
+    
+    <!-- Additional template for custom work  -->
+    <xsl:apply-templates mode="bcit_slurping_MODS" select="$content//mods:mods[1]"/>
   </xsl:template>
 
   <!-- Handle dates. -->
@@ -127,7 +130,7 @@
       <xsl:with-param name="datastream" select="$datastream"/>
     </xsl:call-template>
   </xsl:template>
-
+  
   <!--
     The "eventType" attribute was introduce with MODS 3.5... Let's start
     exposing it for use.
@@ -338,5 +341,18 @@
       <xsl:with-param name="pid" select="$pid"/>
       <xsl:with-param name="datastream" select="$datastream"/>
     </xsl:apply-templates>
+  </xsl:template>
+  
+  <!--
+    Custom field which concatenates namePart family/given values for solr driven display
+  -->
+  <xsl:template match="mods:name[@type='personal'][mods:namePart[@type='family'] and mods:namePart[@type='given']]" mode="bcit_slurping_MODS">
+    <xsl:variable name="value" select="concat(mods:namePart[@type='family'], ', ', mods:namePart[@type='given'])"/>
+    <field>
+      <xsl:attribute name="name">
+        <xsl:text>mods_name_namePart_concatenateNamePart_ms</xsl:text>
+      </xsl:attribute>
+      <xsl:value-of select="$value"/>
+    </field>
   </xsl:template>
 </xsl:stylesheet>
